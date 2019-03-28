@@ -1,0 +1,57 @@
+- Foi feita uma API rest com Json que possui apenas um cadastro de pessoa utilizando flask + swagger + sqlalchemy + postgres .
+Esta aplicação foi divida em view(endpoint), service(regras de negocio) e model(banco de dados)
+
+- para rodar o projeto você deve criar um banco chamado pessoa no seu postgres local
+- criar as tabelas pessoa e endereco pela aplicação importando o db e rodando o comando db,creat_all() ou executando os scritps a seguir:
+
+CREATE SEQUENCE public.endereco_id_seq
+  INCREMENT 1
+  MINVALUE 1
+  MAXVALUE 9223372036854775807;
+
+  CREATE SEQUENCE public.pessoa_id_seq
+  INCREMENT 1
+  MINVALUE 1
+  MAXVALUE 9223372036854775807;
+
+CREATE TABLE public.pessoa
+(
+  id integer NOT NULL DEFAULT nextval('pessoa_id_seq'::regclass),
+  nome character varying(80) NOT NULL,
+  idade integer,
+  email character varying(120),
+  cpf character varying(20) NOT NULL,
+  CONSTRAINT pessoa_pkey PRIMARY KEY (id)
+);
+
+CREATE TABLE public.endereco
+(
+  id integer NOT NULL DEFAULT nextval('endereco_id_seq'::regclass),
+  uf character varying(2),
+  cidade character varying(30),
+  bairro character varying(100),
+  rua character varying(50),
+  pessoa_id integer,
+  CONSTRAINT endereco_pkey PRIMARY KEY (id),
+  CONSTRAINT endereco_pessoa_id_fkey FOREIGN KEY (pessoa_id)
+      REFERENCES public.pessoa (id) MATCH SIMPLE
+      ON UPDATE NO ACTION ON DELETE NO ACTION
+);
+
+- o banco esta configurado com login e senha padrão postgres na url que esta dentro dentro do arquivo __init__.py do pacote app (caso precise mudar), na produção essa configuração poderia estar setada
+em uma variavel de ambiente dentro de um container docker, porém para esse projeto deixei dentro do arquivo
+
+- acesse http://localhost:5000/apidocs/index.html para mais informações sobre a API, apos rodar a aplicação
+
+- você pode utilizar o postman para efetuar as requisições, para faciliar o 'post' utilize o json a seguir:
+
+{
+"nome": "testeee",
+"email": "gisele@teste",
+"cpf": "22222",
+"idade": 20,
+"uf": "sc",
+"cidade": "florianopolis",
+"bairro": "trindade",
+"rua":"lauro linhares"
+}
